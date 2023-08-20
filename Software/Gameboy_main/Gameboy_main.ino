@@ -28,6 +28,14 @@
 char display_lvl0[COLUMN_LVL0][LINE_LENGTH_LVL0];
 //Matricea pentru controlul si pozitionarea sarpelui
 bool display_lvl2[COLUMN_LVL2][LINE_LENGTH_LVL2];
+//aliment sarpe;
+typedef struct snake_food{
+  int point_col;
+  int point_line;
+  int status_food;
+}food;
+
+
 
 //Functie utilizata pentru SPI
 void shiftOut(uint8_t dataPin, uint8_t clockPin,  uint8_t val);
@@ -54,7 +62,12 @@ void point_translate(int column_lvl2,int line_lvl2);
 void matrix_translate();
 //scriere display 
 void write_display();
-
+//generarea cadrului exterior 
+void generare_cadru();
+//generare sarpe 
+void generare_sarpe();
+//void generare fruct 
+void generare_fruct();
 
 
 
@@ -98,6 +111,9 @@ void setup() {
   LCD_INIT();
   matrix_init_lvl0();
   matrix_init_lvl2();
+  generare_sarpe();
+  generare_cadru();
+  matrix_translate();
   write_display();
   
   Serial.begin(9600);
@@ -112,14 +128,11 @@ void setup() {
 void loop() {
   read_buttons();
   debug_buttons();
-  display_lvl2[23][41]=1;
-  display_lvl2[10][13]=1;
-  display_lvl2[10][14]=1;
-  display_lvl2[10][15]=1;
-  display_lvl2[10][16]=1;
-  display_lvl2[10][14]=0;
+  
 
-   
+
+
+  
   matrix_translate();
   write_display();
 
@@ -324,13 +337,13 @@ char get_pattern_off(int column_lvl2){
 void point_translate(int column_lvl2,int line_lvl2){
   int col=get_column(column_lvl2);
   int line=get_line(line_lvl2);
-  if (display_lvl2[column_lvl2][line_lvl2]==1){
+  if (display_lvl2[column_lvl2][line_lvl2]==1 || display_lvl2[column_lvl2][line_lvl2]==2){
       display_lvl0[col][line]=display_lvl0[col][line] | get_pattern_on(column_lvl2);
       display_lvl0[col][line+1]=display_lvl0[col][line+1] | get_pattern_on(column_lvl2);
   }
   if (display_lvl2[column_lvl2][line_lvl2]==0){
-      display_lvl0[col][line]=display_lvl0[col][line] & get_pattern_on(column_lvl2);
-      display_lvl0[col][line+1]=display_lvl0[col][line+1] & get_pattern_on(column_lvl2);
+      display_lvl0[col][line]=display_lvl0[col][line] & get_pattern_off(column_lvl2);
+      display_lvl0[col][line+1]=display_lvl0[col][line+1] & get_pattern_off(column_lvl2);
   }
 };
 ////////////////////
@@ -339,5 +352,39 @@ void matrix_translate(){
     for (int j=0 ; j<LINE_LENGTH_LVL2;j++){
         point_translate(i,j);  
   } 
+}
+}
+///////////////////
+void generare_cadru(){
+    ///generare perete superior
+    for(int i=0;i<LINE_LENGTH_LVL2;i++){
+        display_lvl2[0][i]=1;
+    }
+    ///generare perete inferior
+    for(int i=0;i<LINE_LENGTH_LVL2;i++){
+        display_lvl2[23][i]=1;
+    }
+
+    ///generare perete stanga
+    for(int i=0;i<COLUMN_LVL2;i++){
+        display_lvl2[i][0]=1;
+    }
+    ///generare perete dreapta
+    for(int i=0;i<COLUMN_LVL2;i++){
+        display_lvl2[i][41]=1;
+    }
+
+}
+/////////////////////
+void generare_sarpe(){
+for(int i=20;i<24;i++){
+        display_lvl2[12][i]=1;
+    }
+
+}
+//////////////////////
+void generare_fruct(){
+  food snake_f;
+
 }
 }
