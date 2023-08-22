@@ -119,7 +119,7 @@ void setup() {
   LCD_INIT();
   matrix_init_lvl0();
   matrix_init_lvl2();
-  generare_sarpe();
+  snake_g=generare_sarpe();
   translate_snake();
   generare_cadru();
   matrix_translate();
@@ -155,30 +155,33 @@ void loop() {
 ////////////////////
 int debounce(int button){
 
-static uint8_t count_m = 0;
-static uint8_t button_state_m = 0;
+static int count_m = 0;
+static int button_state_m = 0;
 
-uint8_t current_state_m = digitalRead(button)
+int current_state_m = digitalRead(button);
 
       if (current_state_m != button_state_m) {
+        
       // Button state is about to be changed, increase counter
-      count_m++;
+        count_m++;
+        
       if (count_m >= 4) {
       // The button have not bounced for four checks, change state
+        
         button_state_m = current_state_m;
       // If the button was pressed (not released), tell main so
-      count_m = 0;
-        if (current_state_m != 0) {
+        
+        if (button_state_m != 0) {
+          
+          count_m = 0;
           return 1;
         }
       
       }
       }  
-      else {
-// Reset counter
-    count_m = 0;
+   
     return 0;
-    }
+    
 
     }
 
@@ -440,9 +443,10 @@ snake generare_sarpe(){
 
 void translate_snake(){
   for (int i=0;i<30;i++){
-      if(snake_g.snake_array[i].status=1)
+      if(snake_g.snake_array[i].status==1)
       {
-        display_lvl2[snake_g.snake_array[i].col][snake_g.snake_array[i].line]=1;
+        Serial.println("Here");
+        display_lvl2[snake_g.snake_array[i].column][snake_g.snake_array[i].line]=1;
       }
     }
 
