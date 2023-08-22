@@ -72,6 +72,8 @@ void generare_cadru();
 snake generare_sarpe();
 //translatarea sarpelui pe matricea lvl 2
 void translate_snake();
+//control sarpe 
+void control_snake();
 
 
 snake snake_g;
@@ -440,14 +442,30 @@ snake generare_sarpe(){
     }
     return gen_snake;
 }
-
+////////////////////
 void translate_snake(){
   for (int i=0;i<30;i++){
       if(snake_g.snake_array[i].status==1)
       {
-        Serial.println("Here");
+       
         display_lvl2[snake_g.snake_array[i].column][snake_g.snake_array[i].line]=1;
       }
     }
+
+}
+////////////////////
+void control_snake(){
+  if (button2){
+    snake_g.direction=move_left;
+  }
+  else if (button3){
+    snake_g.direction=move_up;
+  }
+  else if (button4){
+    snake_g.direction=move_down;
+  }
+  else if (button5){
+    snake_g.direction=move_right;
+  }  
 
 }
