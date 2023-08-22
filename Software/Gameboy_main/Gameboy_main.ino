@@ -28,8 +28,18 @@
 char display_lvl0[COLUMN_LVL0][LINE_LENGTH_LVL0];
 //Matricea pentru controlul si pozitionarea sarpelui
 bool display_lvl2[COLUMN_LVL2][LINE_LENGTH_LVL2];
+enum direction{move_up,move_down,move_left,move_right};
 
+typedef struct point_f{
+  int status;
+  int column;
+  int line;
+}point;
 
+typedef struct snakef{
+  int direction;
+  point snake_array[30];
+}snake;
 
 //Functie utilizata pentru SPI
 void shiftOut(uint8_t dataPin, uint8_t clockPin,  uint8_t val);
@@ -59,10 +69,12 @@ void write_display();
 //generarea cadrului exterior 
 void generare_cadru();
 //generare sarpe 
-void generare_sarpe();
+snake generare_sarpe();
+//translatarea sarpelui pe matricea lvl 2
+void translate_snake();
 
 
-
+snake snake_g;
 
 ////////////////////--------------------- DECLARERE BUTOANE --------------------------
 
@@ -108,6 +120,7 @@ void setup() {
   matrix_init_lvl0();
   matrix_init_lvl2();
   generare_sarpe();
+  translate_snake();
   generare_cadru();
   matrix_translate();
   write_display();
@@ -122,13 +135,18 @@ void setup() {
 
 
 void loop() {
+  //initializare display
+  matrix_init_lvl2();
+  generare_cadru();
   ///BUTOANE 
   read_buttons();
   debug_buttons();
   
+
   //LOGICA FUNCTIONARE
 
   //DISPLAY
+  translate_snake();
   matrix_translate();
   write_display();
 
@@ -406,15 +424,26 @@ void generare_cadru(){
 
 }
 /////////////////////
-void generare_sarpe(){
-for(int i=20;i<24;i++){
-        display_lvl2[12][i]=1;
+snake generare_sarpe(){
+    snake gen_snake;
+    gen_snake.direction=left;
+    for (int i=0;i<30;i++){
+      gen_snake.snake_array[i].status=0;
+    }
+    for (int i=0;i<3;i++){
+      gen_snake.snake_array[i].status=1;
+      gen_snake.snake_array[i].column=10;
+      gen_snake.snake_array[i].line=20+i;
+    }
+    return gen_snake;
+}
+
+void translate_snake(){
+  for (int i=0;i<30;i++){
+      if(snake_g.snake_array[i].status=1)
+      {
+        display_lvl2[snake_g.snake_array[i].col][snake_g.snake_array[i].line]=1;
+      }
     }
 
-}
-//////////////////////
-void generare_fruct(){
-  food snake_f;
-
-}
 }
