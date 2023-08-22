@@ -28,12 +28,6 @@
 char display_lvl0[COLUMN_LVL0][LINE_LENGTH_LVL0];
 //Matricea pentru controlul si pozitionarea sarpelui
 bool display_lvl2[COLUMN_LVL2][LINE_LENGTH_LVL2];
-//aliment sarpe;
-typedef struct snake_food{
-  int point_col;
-  int point_line;
-  int status_food;
-}food;
 
 
 
@@ -66,8 +60,7 @@ void write_display();
 void generare_cadru();
 //generare sarpe 
 void generare_sarpe();
-//void generare fruct 
-void generare_fruct();
+
 
 
 
@@ -93,8 +86,11 @@ unsigned int print_up=0;
 unsigned int print_down=0;
 unsigned int print_left=0;
 unsigned int print_right=0;
-
+//debounce citire buton
+int debounce(int button);
+//citire butoane tastatura
 void read_buttons();
+//debug tastatura 
 void debug_buttons();
 
 ////////////////////--------------------- MICROCONTROLLER INIT --------------------------
@@ -126,26 +122,60 @@ void setup() {
 
 
 void loop() {
+  ///BUTOANE 
   read_buttons();
   debug_buttons();
   
+  //LOGICA FUNCTIONARE
 
-
-
-  
+  //DISPLAY
   matrix_translate();
   write_display();
 
 }
 ////////////////////--------------------- DEFINIRE BUTOANE --------------------------///////////////////////
 ////////////////////
+int debounce(int button){
+
+static uint8_t count_m = 0;
+static uint8_t button_state_m = 0;
+
+uint8_t current_state_m = digitalRead(button)
+
+      if (current_state_m != button_state_m) {
+      // Button state is about to be changed, increase counter
+      count_m++;
+      if (count_m >= 4) {
+      // The button have not bounced for four checks, change state
+        button_state_m = current_state_m;
+      // If the button was pressed (not released), tell main so
+      count_m = 0;
+        if (current_state_m != 0) {
+          return 1;
+        }
+      
+      }
+      }  
+      else {
+// Reset counter
+    count_m = 0;
+    return 0;
+    }
+
+    }
+
+
+
+
+
+
 void read_buttons(){
-  button1=digitalRead(OK);
-  button2=digitalRead(left);
-  button3=digitalRead(up);
-  button4=digitalRead(down);
-  button5=digitalRead(right);
-  button6=digitalRead(NOK);
+  button1=debounce(OK);
+  button2=debounce(left);
+  button3=debounce(up);
+  button4=debounce(down);
+  button5=debounce(right);
+  button6=debounce(NOK);
 }
 ////////////////////
 void debug_buttons(){
