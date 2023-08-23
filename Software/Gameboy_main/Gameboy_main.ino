@@ -38,6 +38,7 @@ typedef struct point_f{
 
 typedef struct snakef{
   int direction;
+  int length;
   point snake_array[30];
 }snake;
 
@@ -73,7 +74,12 @@ snake generare_sarpe();
 //translatarea sarpelui pe matricea lvl 2
 void translate_snake();
 //control sarpe 
-void control_snake();
+void control_snake_direction();
+//mmiscare sarpe
+void miscare_sarpe();
+//verificare lovitura perete sau corp sarpe 
+void verificare_lovitura();
+
 
 
 snake snake_g;
@@ -107,6 +113,10 @@ void read_buttons();
 //debug tastatura 
 void debug_buttons();
 
+
+////////////////////------------------------STARE SYSTEM---------------------------------
+int stare_system=0;
+
 ////////////////////--------------------- MICROCONTROLLER INIT --------------------------
 
 void setup() {
@@ -128,6 +138,7 @@ void setup() {
   write_display();
   
   Serial.begin(9600);
+  stare_system=2;
 
 
   
@@ -137,20 +148,43 @@ void setup() {
 
 
 void loop() {
+  //////////////////////starea de initializare system 
+  if(stare_system==2){
   //initializare display
   matrix_init_lvl2();
   generare_cadru();
   ///BUTOANE 
   read_buttons();
   debug_buttons();
-  
-
   //LOGICA FUNCTIONARE
-
+  if (button1){
+    stare_system==3;
+  }
   //DISPLAY
   translate_snake();
   matrix_translate();
   write_display();
+  }
+  ////////////////////starea de control al sarpelui
+  
+  if(stare_system==3){
+  //initializare display
+  matrix_init_lvl2();
+  generare_cadru();
+  ///BUTOANE 
+  read_buttons();
+  debug_buttons();
+  //LOGICA FUNCTIONARE
+  control_snake_direction();
+  miscare_sarpe();
+  if(verificare_lovitura()){
+    stare_system==2;
+  }
+  //DISPLAY
+  translate_snake();
+  matrix_translate();
+  write_display();
+  }
 
 }
 ////////////////////--------------------- DEFINIRE BUTOANE --------------------------///////////////////////
@@ -432,8 +466,10 @@ void generare_cadru(){
 snake generare_sarpe(){
     snake gen_snake;
     gen_snake.direction=left;
+    gen_snake.length=2;
     for (int i=0;i<30;i++){
       gen_snake.snake_array[i].status=0;
+      
     }
     for (int i=0;i<3;i++){
       gen_snake.snake_array[i].status=1;
@@ -454,18 +490,140 @@ void translate_snake(){
 
 }
 ////////////////////
-void control_snake(){
-  if (button2){
+void control_snake_direction(){
+  if (button2 && snake_g.direction!=move_right){
     snake_g.direction=move_left;
   }
-  else if (button3){
+  else if (button3 && snake_g.direction!=move_down){
     snake_g.direction=move_up;
   }
-  else if (button4){
+  else if (button4 && snake_g.direction!=move_up){
     snake_g.direction=move_down;
   }
-  else if (button5){
+  else if (button5 && snake_g.direction!=move_left){
     snake_g.direction=move_right;
   }  
+
+}
+/////////////////////
+
+void miscare_sarpe(){
+
+  ///////////////////MISCARE STANGA
+  if(snake_g.direction=move_left){
+      //create new point left 
+      snake_g.snake_array[snake_g.length+1].status=1;
+      snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column;
+      snake_g.snake_array[snake_g.length+1].line=snake_g.snake_array[snake_g.length].line+1;
+
+     //shifteaza array stanga pentru elminarea cozii
+       for(int i=1;i<30;i++){
+
+         if (snake_g.snake_array[i].status==1){
+                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status
+                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column
+                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line
+
+         }
+
+  }
+      //stersge punct adaugat
+      snake_g.snake_array[snake_g.length+1].status=0;
+      snake_g.snake_array[snake_g.length+1].column=0;
+      snake_g.snake_array[snake_g.length+1].line=0;
+
+  }
+
+
+  ///////////////////MISCARE DREAPTA
+  if(snake_g.direction=move_right){
+      //create new point right
+      snake_g.snake_array[snake_g.length+1].status=1;
+      snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column;
+      snake_g.snake_array[snake_g.length+1].line=snake_g.snake_array[snake_g.length].line-1;
+
+     //shifteaza array stanga pentru elminarea cozii
+       for(int i=1;i<30;i++){
+
+         if (snake_g.snake_array[i].status==1){
+                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status
+                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column
+                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line
+
+         }
+
+  }
+      //stersge punct adaugat
+      snake_g.snake_array[snake_g.length+1].status=0;
+      snake_g.snake_array[snake_g.length+1].column=0;
+      snake_g.snake_array[snake_g.length+1].line=0;
+
+  }
+
+  ///////////////////MISCARE SUS
+  if(snake_g.direction=move_up){
+      //create new point right
+      snake_g.snake_array[snake_g.length+1].status=1;
+      snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column-1;
+      snake_g.snake_array[snake_g.length+1].line=snake_g.snake_array[snake_g.length].line;
+
+     //shifteaza array stanga pentru elminarea cozii
+       for(int i=1;i<30;i++){
+
+         if (snake_g.snake_array[i].status==1){
+                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status
+                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column
+                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line
+
+         }
+
+  }
+      //stersge punct adaugat
+      snake_g.snake_array[snake_g.length+1].status=0;
+      snake_g.snake_array[snake_g.length+1].column=0;
+      snake_g.snake_array[snake_g.length+1].line=0;
+
+  }
+  
+
+  ////////////////MISCARE JOS
+  if(snake_g.direction=move_down){
+      //create new point right
+      snake_g.snake_array[snake_g.length+1].status=1;
+      snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column+1;
+      snake_g.snake_array[snake_g.length+1].line=snake_g.snake_array[snake_g.length].line;
+
+     //shifteaza array stanga pentru elminarea cozii
+       for(int i=1;i<30;i++){
+
+         if (snake_g.snake_array[i].status==1){
+                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status
+                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column
+                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line
+
+         }
+
+  }
+      //stersge punct adaugat
+      snake_g.snake_array[snake_g.length+1].status=0;
+      snake_g.snake_array[snake_g.length+1].column=0;
+      snake_g.snake_array[snake_g.length+1].line=0;
+
+  }
+
+
+
+}
+
+/////////////////////
+void verificare_lovitura(){
+    if( display_lvl2[snake_g.snake_array[snake_g.length].column][snake_g.snake_array[snake_g.length].line] == 1 ){
+      return 1;
+    }
+    else{
+      return 0;
+    }
+
+        
 
 }
