@@ -42,6 +42,9 @@ typedef struct snakef{
   point snake_array[30];
 }snake;
 
+
+
+
 //Functie utilizata pentru SPI
 void shiftOut(uint8_t dataPin, uint8_t clockPin,  uint8_t val);
 //Initializare Display
@@ -81,9 +84,20 @@ void miscare_sarpe();
 int verificare_lovitura();
 //crestere sarpe dupa mancare 
 void creste ();
+//generare fruct 
+void generare_fruct();
+//translatare fruct 
+void translatare_fruct();
+//void hranire sarpe 
+void hraneste_te();
 
 
 
+
+
+
+///variablie control sarpe +fruct
+point fruct ;
 snake snake_g;
 long int count_move =0 ;
 int f_p=0;
@@ -142,6 +156,10 @@ void setup() {
   
   Serial.begin(9600);
   stare_system=2;
+  //initializare fruct
+  fruct.status=0;
+  fruct.column=0;
+  fruct.line=0;
 
 
   
@@ -187,17 +205,21 @@ void loop() {
   count_move=0;
   }
   if(button6 && f_p==0){
-    creste();
+    fruct.status=0;
   }
   f_p=button6;
+  hraneste_te();
   if(verificare_lovitura()){
     stare_system=2;
   }
   //DISPLAY
   translate_snake();
+  generare_fruct();
+  translatare_fruct();
   matrix_translate();
   write_display();
-  }
+}
+ 
 
 }
 ////////////////////--------------------- DEFINIRE BUTOANE --------------------------///////////////////////
@@ -676,3 +698,35 @@ if(snake_g.direction==move_down){
 
 }
 
+////////////////////
+void generare_fruct(){
+  int col;
+  int line;
+  if (fruct.status==0){
+      fruct.status=2 ;
+      col=(int)random(2,22);
+      line=(int)random(2,40);
+      while (display_lvl2[col][line] != 0 ) {
+              col=(int)random(2,22);
+              line=(int)random(2,40);
+      }
+      fruct.column=col;
+      fruct.line=line;
+
+  }
+  
+}
+
+////////////////////
+void translatare_fruct(){
+        display_lvl2[fruct.column][fruct.line]=2;
+
+}
+
+////////////////////
+void hraneste_te(){
+  if(snake_g.snake_array[snake_g.length].column==fruct.column && snake_g.snake_array[snake_g.length].line==fruct.line){
+      creste();
+      fruct.status=0 ;
+  }
+}
