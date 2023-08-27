@@ -78,11 +78,12 @@ void control_snake_direction();
 //mmiscare sarpe
 void miscare_sarpe();
 //verificare lovitura perete sau corp sarpe 
-void verificare_lovitura();
+int verificare_lovitura();
 
 
 
 snake snake_g;
+long int count_move =0 ;
 
 ////////////////////--------------------- DECLARERE BUTOANE --------------------------
 
@@ -151,14 +152,16 @@ void loop() {
   //////////////////////starea de initializare system 
   if(stare_system==2){
   //initializare display
+  matrix_init_lvl0();
   matrix_init_lvl2();
+  snake_g=generare_sarpe();
   generare_cadru();
   ///BUTOANE 
   read_buttons();
   debug_buttons();
   //LOGICA FUNCTIONARE
   if (button1){
-    stare_system==3;
+    stare_system=3;
   }
   //DISPLAY
   translate_snake();
@@ -176,9 +179,14 @@ void loop() {
   debug_buttons();
   //LOGICA FUNCTIONARE
   control_snake_direction();
+  count_move++;
+  if (count_move==50){
   miscare_sarpe();
+  count_move=0;
+  }
+  
   if(verificare_lovitura()){
-    stare_system==2;
+    stare_system=2;
   }
   //DISPLAY
   translate_snake();
@@ -228,10 +236,10 @@ int current_state_m = digitalRead(button);
 
 void read_buttons(){
   button1=debounce(OK);
-  button2=debounce(left);
+  button2=debounce(right);
   button3=debounce(up);
   button4=debounce(down);
-  button5=debounce(right);
+  button5=debounce(left);
   button6=debounce(NOK);
 }
 ////////////////////
@@ -295,50 +303,50 @@ void debug_buttons(){
 ////////////////////--------------------- DEFINIRE DISPLAY --------------------------///////////////////////
 ////////////////////
 void LCD_INIT(){
-		 pinMode(RST, OUTPUT);
-		 pinMode(CE, OUTPUT);
-		 pinMode(DC, OUTPUT);
-		 pinMode(DIN, OUTPUT);
-		 pinMode(CLK, OUTPUT);
-		 digitalWrite(RST, LOW);
-		 digitalWrite(RST, HIGH);	 
-		 LcdWriteCmd(0x21);  // LCD extended commands
-		 LcdWriteCmd(0xB0);  // set LCD Vop (contrast)
-		 LcdWriteCmd(0x04);  // set temp coefficent
-		 LcdWriteCmd(0x14);  // LCD bias mode 1:40
-		 LcdWriteCmd(0x20);  // LCD basic commands
-		 LcdWriteCmd(0x0C);  // LCD basic commands
-	
+     pinMode(RST, OUTPUT);
+     pinMode(CE, OUTPUT);
+     pinMode(DC, OUTPUT);
+     pinMode(DIN, OUTPUT);
+     pinMode(CLK, OUTPUT);
+     digitalWrite(RST, LOW);
+     digitalWrite(RST, HIGH);  
+     LcdWriteCmd(0x21);  // LCD extended commands
+     LcdWriteCmd(0xB0);  // set LCD Vop (contrast)
+     LcdWriteCmd(0x04);  // set temp coefficent
+     LcdWriteCmd(0x14);  // LCD bias mode 1:40
+     LcdWriteCmd(0x20);  // LCD basic commands
+     LcdWriteCmd(0x0C);  // LCD basic commands
+  
 }
 ////////////////////
 void shiftOut(uint8_t dataPin, uint8_t clockPin,  uint8_t val)
 {
-	uint8_t i;
-	/// SHIFT OUT MSB FIRST
-	for (i = 0; i < 8; i++)  {
-		
-		digitalWrite(dataPin, !!(val & (1 << (7 - i))));
-		
-		digitalWrite(clockPin, HIGH);
-		digitalWrite(clockPin, LOW);
-	}
+  uint8_t i;
+  /// SHIFT OUT MSB FIRST
+  for (i = 0; i < 8; i++)  {
+    
+    digitalWrite(dataPin, !!(val & (1 << (7 - i))));
+    
+    digitalWrite(clockPin, HIGH);
+    digitalWrite(clockPin, LOW);
+  }
 };
 ////////////////////
 void LcdWriteCmd(char cmd)
 {
-	digitalWrite(DC, LOW); //DC pin is low for commands
-	digitalWrite(CE, LOW);
-	shiftOut(DIN, CLK, cmd); //transmit serial commands
-	digitalWrite(CE, HIGH);
+  digitalWrite(DC, LOW); //DC pin is low for commands
+  digitalWrite(CE, LOW);
+  shiftOut(DIN, CLK, cmd); //transmit serial commands
+  digitalWrite(CE, HIGH);
 };
 
 ////////////////////
 void LcdWriteData(char dat)
 {
-	digitalWrite(DC, HIGH); //DC pin is high for data
-	digitalWrite(CE, LOW);
-	shiftOut(DIN, CLK, dat); //transmit serial data
-	digitalWrite(CE, HIGH);
+  digitalWrite(DC, HIGH); //DC pin is high for data
+  digitalWrite(CE, LOW);
+  shiftOut(DIN, CLK, dat); //transmit serial data
+  digitalWrite(CE, HIGH);
 };
 
 ////////////////////
@@ -510,7 +518,7 @@ void control_snake_direction(){
 void miscare_sarpe(){
 
   ///////////////////MISCARE STANGA
-  if(snake_g.direction=move_left){
+  if(snake_g.direction==move_left){
       //create new point left 
       snake_g.snake_array[snake_g.length+1].status=1;
       snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column;
@@ -520,9 +528,9 @@ void miscare_sarpe(){
        for(int i=1;i<30;i++){
 
          if (snake_g.snake_array[i].status==1){
-                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status
-                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column
-                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line
+                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status;
+                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column;
+                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line;
 
          }
 
@@ -536,7 +544,7 @@ void miscare_sarpe(){
 
 
   ///////////////////MISCARE DREAPTA
-  if(snake_g.direction=move_right){
+  if(snake_g.direction==move_right){
       //create new point right
       snake_g.snake_array[snake_g.length+1].status=1;
       snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column;
@@ -546,9 +554,9 @@ void miscare_sarpe(){
        for(int i=1;i<30;i++){
 
          if (snake_g.snake_array[i].status==1){
-                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status
-                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column
-                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line
+                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status;
+                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column;
+                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line;
 
          }
 
@@ -561,7 +569,7 @@ void miscare_sarpe(){
   }
 
   ///////////////////MISCARE SUS
-  if(snake_g.direction=move_up){
+  if(snake_g.direction==move_up){
       //create new point right
       snake_g.snake_array[snake_g.length+1].status=1;
       snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column-1;
@@ -571,9 +579,9 @@ void miscare_sarpe(){
        for(int i=1;i<30;i++){
 
          if (snake_g.snake_array[i].status==1){
-                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status
-                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column
-                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line
+                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status;
+                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column;
+                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line;
 
          }
 
@@ -587,7 +595,7 @@ void miscare_sarpe(){
   
 
   ////////////////MISCARE JOS
-  if(snake_g.direction=move_down){
+  if(snake_g.direction==move_down){
       //create new point right
       snake_g.snake_array[snake_g.length+1].status=1;
       snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column+1;
@@ -597,9 +605,9 @@ void miscare_sarpe(){
        for(int i=1;i<30;i++){
 
          if (snake_g.snake_array[i].status==1){
-                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status
-                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column
-                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line
+                  snake_g.snake_array[i-1].status=snake_g.snake_array[i].status;
+                  snake_g.snake_array[i-1].column=snake_g.snake_array[i].column;
+                  snake_g.snake_array[i-1].line=snake_g.snake_array[i].line;
 
          }
 
@@ -616,7 +624,7 @@ void miscare_sarpe(){
 }
 
 /////////////////////
-void verificare_lovitura(){
+int  verificare_lovitura(){
     if( display_lvl2[snake_g.snake_array[snake_g.length].column][snake_g.snake_array[snake_g.length].line] == 1 ){
       return 1;
     }
