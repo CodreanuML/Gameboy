@@ -79,12 +79,14 @@ void control_snake_direction();
 void miscare_sarpe();
 //verificare lovitura perete sau corp sarpe 
 int verificare_lovitura();
+//crestere sarpe dupa mancare 
+void creste ();
 
 
 
 snake snake_g;
 long int count_move =0 ;
-
+int f_p=0;
 ////////////////////--------------------- DECLARERE BUTOANE --------------------------
 
 int button1;
@@ -184,7 +186,10 @@ void loop() {
   miscare_sarpe();
   count_move=0;
   }
-  
+  if(button6 && f_p==0){
+    creste();
+  }
+  f_p=button6;
   if(verificare_lovitura()){
     stare_system=2;
   }
@@ -635,3 +640,39 @@ int  verificare_lovitura(){
         
 
 }
+//////////////////////
+void creste (){
+  if (snake_g.length<28){
+    
+      if(snake_g.direction==move_left){
+     
+      snake_g.snake_array[snake_g.length+1].status=1;
+      snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column;
+      snake_g.snake_array[snake_g.length+1].line=snake_g.snake_array[snake_g.length].line+1;
+
+    }
+  if(snake_g.direction==move_right){
+      //create new point right
+      snake_g.snake_array[snake_g.length+1].status=1;
+      snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column;
+      snake_g.snake_array[snake_g.length+1].line=snake_g.snake_array[snake_g.length].line-1;
+  }
+
+ if(snake_g.direction==move_up){
+      //create new point right
+      snake_g.snake_array[snake_g.length+1].status=1;
+      snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column-1;
+      snake_g.snake_array[snake_g.length+1].line=snake_g.snake_array[snake_g.length].line;
+}
+
+if(snake_g.direction==move_down){   
+      snake_g.snake_array[snake_g.length+1].status=1;
+      snake_g.snake_array[snake_g.length+1].column=snake_g.snake_array[snake_g.length].column+1;
+      snake_g.snake_array[snake_g.length+1].line=snake_g.snake_array[snake_g.length].line;
+
+     }
+     snake_g.length++;
+}
+
+}
+
