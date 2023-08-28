@@ -209,11 +209,12 @@ void loop() {
   }
   f_p=button6;
   hraneste_te();
+
+  //DISPLAY
+  translate_snake();
   if(verificare_lovitura()){
     stare_system=2;
   }
-  //DISPLAY
-  translate_snake();
   generare_fruct();
   translatare_fruct();
   matrix_translate();
@@ -652,13 +653,27 @@ void miscare_sarpe(){
 
 /////////////////////
 int  verificare_lovitura(){
-    if( display_lvl2[snake_g.snake_array[snake_g.length].column][snake_g.snake_array[snake_g.length].line] == 1 ){
-      return 1;
-    }
-    else{
-      return 0;
-    }
 
+////////////////MISCARE STANGAs
+    if(snake_g.direction==move_left && display_lvl2[snake_g.snake_array[snake_g.length].column][snake_g.snake_array[snake_g.length].line+1] == 1){
+       return 1;
+
+  }
+  ///////////////////MISCARE DREAPTA
+  if(snake_g.direction==move_right &&  display_lvl2[snake_g.snake_array[snake_g.length].column][snake_g.snake_array[snake_g.length].line-1] == 1 ){
+            return 1;
+  }
+  ///////////////////MISCARE SUS
+  if(snake_g.direction==move_up && display_lvl2[snake_g.snake_array[snake_g.length].column-1][snake_g.snake_array[snake_g.length].line] == 1){
+            return 1;
+      
+  }
+  ////////////////MISCARE JOS
+  if(snake_g.direction==move_down  &&  display_lvl2[snake_g.snake_array[snake_g.length].column+1][snake_g.snake_array[snake_g.length].line] == 1){  
+      return 1;
+  }
+      
+  return 0;
         
 
 }
